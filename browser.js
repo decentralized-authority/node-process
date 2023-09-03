@@ -182,3 +182,23 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 process.umask = function() { return 0; };
+
+// adapted from https://github.com/kumavis/browser-process-hrtime
+const performance = typeof performance !== 'undefined' ? performance : {}
+const performanceNow =
+  performance.now        ||
+  function(){ return (new Date()).getTime() }
+process.hrtime = function hrtime(previousTimestamp){
+    const clocktime = performanceNow.call(performance)*1e-3
+    let seconds = Math.floor(clocktime)
+    let nanoseconds = Math.floor((clocktime%1)*1e9)
+    if (previousTimestamp) {
+        seconds = seconds - previousTimestamp[0]
+        nanoseconds = nanoseconds - previousTimestamp[1]
+        if (nanoseconds<0) {
+            seconds--
+            nanoseconds += 1e9
+        }
+    }
+    return [seconds,nanoseconds]
+}
