@@ -184,10 +184,10 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 // adapted from https://github.com/kumavis/browser-process-hrtime
-const performance = typeof performance !== 'undefined' ? performance : {}
-const performanceNow =
-  performance.now        ||
-  function(){ return (new Date()).getTime() }
+const performanceNow = typeof performance !== 'undefined' && typeof performance.now === 'function' ?
+    performance.now
+    :
+    () => Date.now()
 process.hrtime = function hrtime(previousTimestamp){
     const clocktime = performanceNow.call(performance)*1e-3
     let seconds = Math.floor(clocktime)
